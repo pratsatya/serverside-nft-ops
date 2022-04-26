@@ -30,10 +30,20 @@ function getConfig(env) {
             }
     }
 }
+function getContractConfig(env){
+    switch(env){
+        case 'mainnet':
+            return { contract_type:'uniqart-v1.near'}
+
+        case 'testnet':
+            return { contract_type: 'uniqart-v1.testnet'}
+    }
+}
 
 
 module.exports = {
-    getConfig
+    getConfig,
+    getContractConfig
 };
 
 
