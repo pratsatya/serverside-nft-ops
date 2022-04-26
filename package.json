@@ -1,0 +1,16 @@
+{
+  "name": "dev-uniqart-nft-ops",
+  "version": "1.0.0",
+  "description": "scripts to do nft transfer/mint/sell ops using near-api-js",
+  "main": "app.js",
+  "scripts": {
+    "test": ""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv": "^6.0.5",
+    "fs": "^0.0.1-security",
+    "near-api-js": "^0.44.2"
+  }
+}
