@@ -1,5 +1,7 @@
+const { rejects } = require('assert');
 const nearAPI = require('near-api-js');
 const { loadavg } = require('os');
+const { resolve } = require('path');
 const { keyStores, connect, utils } = nearAPI;
 const homedir = require("os").homedir();
 const CREDENTIALS_DIR = ".near-credentials";
@@ -34,6 +36,7 @@ function loadContract(account,contract_name,contract_view_methods,contract_chang
         }
     );
     console.log("*************************************************************************************** ",contract);
+    return contract;
 }
 
 async function accountState(near,wl_near_id) {
@@ -55,27 +58,38 @@ async function near_nftTransfer(config,contract_name,contract_view_methods,contr
         const account = await loadAccount(near,sender_account);
         const contract = loadContract(account,contract_name,contract_view_methods,contract_change_methods);
 
+        //initialize empty array for result storage
+        result_array = [];
         // call contract
         for (let iter = 0; iter < wl_ids.length; iter++) {
             const wl_near_id = wl_ids[iter][0];
-            //check account state
+
             try{
+                //check account state
                 const accountstate = await accountState(near,wl_near_id);
-                //     for (let token_iter = 0; token_iter < token_ids.length; token_iter++) {
-        //         const token_element = token_ids[token_iter];
-        //         const methodcall = await contract.nft_mint_single( { token_type_id: token_element, receiver_id: element },
-        //                                                             "300000000000000", // attached GAS (optional)
-        //                                                             // "1000000000000000000000000" // attached deposit in yoctoNEAR (optional)
-        //                                                             utils.format.parseNearAmount("1")
-        //                                                           );
-        //         console.log("*************************************************************************************** ",element,"  |  ",token_element);
-        //         console.log(methodcall)
-        //     }      
+
+                    for (let token_iter = 0; token_iter < token_ids.length; token_iter++) {
+                        const token_element = token_ids[token_iter];
+                        //call contract method
+                        const methodcall = await contract.nft_mint_single( 
+                                                                    { token_type_id: token_element, receiver_id: wl_near_id },
+                                                                    "300000000000000", // attached GAS (optional)
+                                                                    // "1000000000000000000000000" // attached deposit in yoctoNEAR (optional)
+                                                                    utils.format.parseNearAmount("0.1")
+                                                                  );
+                         console.log("*************************************************************************************** ",wl_near_id,"  |  ",token_element);
+                         console.log(methodcall);
+                         //check if true
+                         result_array.push([wl_near_id,token_element]);
+                         console.log(result_array);
+            }      
             }
             catch(e){
                 console.log("Error out\n",e);
             }
         }
+
+        return result_array;
     }
 
 
@@ -87,15 +101,3 @@ module.exports = {
     accountState,
     near_nftTransfer
 };
-
-
-
-
-
-
-
-
-
-
-
-//near call uniqart-v1.testnet nft_mint_single '{"token_type_id":"9519", "receiver_id":"prats.testnet"}' --accountId near_lottery.testnet --gas 300000000000000 --deposit 0.1
